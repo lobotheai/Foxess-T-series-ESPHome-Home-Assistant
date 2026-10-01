@@ -184,6 +184,10 @@ sensor:
                 id(inverter_mode_text_sensor).publish_state("Waiting for response...");
               }
 
+    # Optional raw value from function 0x03; its origin/meaning is not confirmed.
+    # function_03_counter:
+    #   name: "FoxESS Function 0x03 Raw Counter"
+
 # Uncomment this sensor and the i2c section to use the AHT10 (remove ambient_temp above)
 #  - platform: aht10
 #    temperature:

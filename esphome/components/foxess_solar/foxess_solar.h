@@ -46,6 +46,10 @@ struct MsgOffset {
   static constexpr std::size_t HEARTBEAT_SERIAL_NUMBER        = 15;
   static constexpr std::size_t HEARTBEAT_PAYLOAD_LEN          = 21;
 
+  // Other data frame (function 0x03), observed on T6-G3
+  static constexpr std::size_t FUNCTION_03_PAYLOAD_LEN        = 50;
+  static constexpr std::size_t FUNCTION_03_COUNTER_MSB        = 45;  // frame offset; payload offset 36
+
   // powers
   static constexpr std::size_t GRID_POWER_MSB    = 9;
   static constexpr std::size_t GRID_POWER_LSB    = 10;
@@ -119,6 +123,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   SENSOR_SETTER(energy_production_day)
   SENSOR_SETTER(total_energy_production)
   SENSOR_SETTER(inverter_status)
+  SENSOR_SETTER(function_03_counter)
 
   PHASE_SENSOR_SETTER(voltage)
   PHASE_SENSOR_SETTER(current)
@@ -150,6 +155,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
 
   uint32_t inverter_mode_{99};
   sensor::Sensor *inverter_status_{nullptr};  // 0=Offline, 1=Online, 2=Error, 99=Waiting...
+  sensor::Sensor *function_03_counter_{nullptr};
 
   struct SolarPhase {
     sensor::Sensor *voltage_sensor_{nullptr};

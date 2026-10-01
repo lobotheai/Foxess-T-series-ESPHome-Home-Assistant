@@ -57,6 +57,7 @@ CONF_DEVICE_CAPACITY = "device_capacity"
 CONF_AFG_VERSION = "afg_version"
 CONF_PROTOCOL_VERSION = "protocol_version"
 CONF_SERIAL_NUMBER = "serial_number"
+CONF_FUNCTION_03_COUNTER = "function_03_counter"
 
 DEPENDENCIES = ["uart"]
 
@@ -127,6 +128,7 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_PV3): PV_SCHEMA,
             cv.Optional(CONF_PV4): PV_SCHEMA,
             cv.Optional(CONF_INVERTER_STATUS): sensor.sensor_schema(),
+            cv.Optional(CONF_FUNCTION_03_COUNTER): sensor.sensor_schema(accuracy_decimals=0),
             cv.Optional(CONF_LOADS_POWER): sensor.sensor_schema(
                 unit_of_measurement=UNIT_WATT,
                 accuracy_decimals=0,
@@ -248,6 +250,7 @@ async def to_code(config):
     # simple top-level sensors
     for key in [
         CONF_INVERTER_STATUS,
+        CONF_FUNCTION_03_COUNTER,
         CONF_LOADS_POWER,
         CONF_GRID_POWER,
         CONF_GENERATION_POWER,

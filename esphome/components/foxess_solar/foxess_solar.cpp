@@ -208,6 +208,15 @@ void FoxessSolar::parse_message() {
       this->parse_heartbeat();
       return;
     case 0x03: {
+      if (payload_len == MsgOffset::FUNCTION_03_PAYLOAD_LEN) {
+        publish_sensor_state(this->function_03_counter_,
+                             decode_uint16(msg[MsgOffset::FUNCTION_03_COUNTER_MSB],
+                                           msg[MsgOffset::FUNCTION_03_COUNTER_MSB + 1]),
+                             1.0f);
+      } else {
+        ESP_LOGD(TAG, "Unsupported FoxESS function 0x03 payload length: %u", payload_len);
+      }
+
       constexpr std::size_t preview_limit = 50;
       const std::size_t preview_len = payload_len < preview_limit ? payload_len : preview_limit;
       char payload_hex[preview_limit * 3 + 1]{};
