@@ -118,7 +118,7 @@ optional<bool> FoxessSolar::check_msg() {
   const std::size_t idx = this->buffer_end;
 
   // 1) header check
-  if (idx <= 2) {
+  if (idx < MSG_HEADER.size()) {
     if (this->input_buffer[idx] == MSG_HEADER[idx]) {
       return {};
     } else {
@@ -172,7 +172,18 @@ optional<bool> FoxessSolar::check_msg() {
 void FoxessSolar::parse_message() {
   ESP_LOGVV(TAG, "parse_message start");
 
+  const std::size_t total_len = this->buffer_end + 1;
   auto &msg = this->input_buffer;
+  const uint8_t function_code = msg[2];
+  const uint16_t payload_len = decode_uint16(msg[7], msg[8]);
+
+  ESP_LOGD(TAG, "FoxESS frame: function=0x%02X payload=%u total=%u", function_code,
+           payload_len, static_cast<unsigned>(total_len));
+
+  if (function_code != 0x02) {
+    ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
+    return;
+  }
 
   // powers
   publish_sensor_state(this->grid_power_,
