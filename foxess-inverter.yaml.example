@@ -131,6 +131,13 @@ sensor:
     loads_power:
       name: "FoxESS Loads Power"
 
+    eps_voltage:
+      name: "FoxESS EPS Voltage"
+    eps_current:
+      name: "FoxESS EPS Current"
+    eps_power:
+      name: "FoxESS EPS Power"
+
     inverter_temp:
       name: "FoxESS Inverter Temp"
     ambient_temp:

@@ -43,6 +43,9 @@ CONF_INVERTER_STATUS = "inverter_status"
 CONF_INVERTER_TEMP = "inverter_temp"
 CONF_BOOST_TEMP = "boost_temp"
 CONF_AMBIENT_TEMP = "ambient_temp"
+CONF_EPS_VOLTAGE = "eps_voltage"
+CONF_EPS_CURRENT = "eps_current"
+CONF_EPS_POWER = "eps_power"
 
 DEPENDENCIES = ["uart"]
 
@@ -91,7 +94,7 @@ PV_SENSORS = {
     ),
     CONF_ACTIVE_POWER: sensor.sensor_schema(
         unit_of_measurement=UNIT_WATT,
-        accuracy_decimals=1,
+        accuracy_decimals=0,
         device_class=DEVICE_CLASS_POWER,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -143,6 +146,24 @@ CONFIG_SCHEMA = (
                 device_class=DEVICE_CLASS_TEMPERATURE,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
+            cv.Optional(CONF_EPS_VOLTAGE): sensor.sensor_schema(
+                unit_of_measurement=UNIT_VOLT,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_VOLTAGE,
+                state_class=STATE_CLASS_MEASUREMENT,
+            ),
+            cv.Optional(CONF_EPS_CURRENT): sensor.sensor_schema(
+                unit_of_measurement=UNIT_AMPERE,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_CURRENT,
+                state_class=STATE_CLASS_MEASUREMENT,
+            ),
+            cv.Optional(CONF_EPS_POWER): sensor.sensor_schema(
+                unit_of_measurement=UNIT_WATT,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_POWER,
+                state_class=STATE_CLASS_MEASUREMENT,
+            ),
             cv.Optional(CONF_BOOST_TEMP): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=0,
@@ -187,6 +208,9 @@ async def to_code(config):
         CONF_GENERATION_POWER,
         CONF_INVERTER_TEMP,
         CONF_AMBIENT_TEMP,
+        CONF_EPS_VOLTAGE,
+        CONF_EPS_CURRENT,
+        CONF_EPS_POWER,
         CONF_BOOST_TEMP,
         CONF_ENERGY_PRODUCTION_DAY,
         CONF_TOTAL_ENERGY_PRODUCTION,

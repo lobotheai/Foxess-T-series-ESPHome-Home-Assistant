@@ -43,6 +43,12 @@ struct MsgOffset {
   // PVs
   static constexpr std::size_t PV1_BASE          = 39;  // 39..42
   static constexpr std::size_t PV_STRIDE         = 6;   // 45, 51, 57
+  static constexpr std::size_t PV_POWER_OFFSET   = 4;   // power follows voltage and current
+
+  // EPS output
+  static constexpr std::size_t EPS_VOLTAGE_MSB   = 99;
+  static constexpr std::size_t EPS_CURRENT_MSB   = 101;
+  static constexpr std::size_t EPS_POWER_MSB     = 103;
 
   // temps
   static constexpr std::size_t BOOST_TEMP_MSB    = 63;
@@ -73,6 +79,9 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   SENSOR_SETTER(boost_temp)
   SENSOR_SETTER(inverter_temp)
   SENSOR_SETTER(ambient_temp)
+  SENSOR_SETTER(eps_voltage)
+  SENSOR_SETTER(eps_current)
+  SENSOR_SETTER(eps_power)
   SENSOR_SETTER(energy_production_day)
   SENSOR_SETTER(total_energy_production)
   SENSOR_SETTER(inverter_status)
@@ -125,6 +134,9 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *boost_temp_{nullptr};
   sensor::Sensor *inverter_temp_{nullptr};
   sensor::Sensor *ambient_temp_{nullptr};
+  sensor::Sensor *eps_voltage_{nullptr};
+  sensor::Sensor *eps_current_{nullptr};
+  sensor::Sensor *eps_power_{nullptr};
   sensor::Sensor *energy_production_day_{nullptr};
   sensor::Sensor *total_energy_production_{nullptr};
 };

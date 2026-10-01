@@ -84,6 +84,9 @@ void FoxessSolar::update() {
       publish_sensor_state(this->boost_temp_, 0, NAN);
       publish_sensor_state(this->ambient_temp_, 0, NAN);
       publish_sensor_state(this->inverter_temp_, 0, NAN);
+      publish_sensor_state(this->eps_voltage_, 0, NAN);
+      publish_sensor_state(this->eps_current_, 0, NAN);
+      publish_sensor_state(this->eps_power_, 0, NAN);
 
       this->publish_zero_phases();
       this->publish_zero_pvs();
@@ -220,9 +223,24 @@ void FoxessSolar::parse_message() {
     publish_sensor_state(pv.voltage_sensor_, volt, 0.1f);
     publish_sensor_state(pv.current_sensor_, amps, 0.1f);
     publish_sensor_state(pv.active_power_sensor_,
-                         static_cast<int32_t>(volt) * static_cast<int32_t>(amps),
-                         0.01f);
+                         decode_uint16(msg[base + MsgOffset::PV_POWER_OFFSET],
+                                       msg[base + MsgOffset::PV_POWER_OFFSET + 1]),
+                         1.0f);
   }
+
+  // EPS output
+  publish_sensor_state(this->eps_voltage_,
+                       decode_int16(msg[MsgOffset::EPS_VOLTAGE_MSB],
+                                    msg[MsgOffset::EPS_VOLTAGE_MSB + 1]),
+                       0.1f);
+  publish_sensor_state(this->eps_current_,
+                       decode_int16(msg[MsgOffset::EPS_CURRENT_MSB],
+                                    msg[MsgOffset::EPS_CURRENT_MSB + 1]),
+                       0.1f);
+  publish_sensor_state(this->eps_power_,
+                       decode_int16(msg[MsgOffset::EPS_POWER_MSB],
+                                    msg[MsgOffset::EPS_POWER_MSB + 1]),
+                       1.0f);
 
   // temps
   publish_sensor_state(this->boost_temp_,
