@@ -207,6 +207,23 @@ void FoxessSolar::parse_message() {
     case 0x06:
       this->parse_heartbeat();
       return;
+    case 0x03: {
+      constexpr std::size_t preview_limit = 50;
+      const std::size_t preview_len = payload_len < preview_limit ? payload_len : preview_limit;
+      char payload_hex[preview_limit * 3 + 1]{};
+      std::size_t output_len = 0;
+      for (std::size_t i = 0; i < preview_len; i++) {
+        const int written = snprintf(payload_hex + output_len, sizeof(payload_hex) - output_len,
+                                     "%02X%s", static_cast<unsigned>(msg[9 + i]),
+                                     i + 1 < preview_len ? " " : "");
+        if (written < 0 || static_cast<std::size_t>(written) >= sizeof(payload_hex) - output_len)
+          break;
+        output_len += static_cast<std::size_t>(written);
+      }
+      ESP_LOGD(TAG, "FoxESS function 0x03 raw payload (first %u of %u bytes): %s",
+               static_cast<unsigned>(preview_len), static_cast<unsigned>(payload_len), payload_hex);
+      return;
+    }
     default:
       ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
       return;
