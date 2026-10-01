@@ -94,6 +94,8 @@ sensor:
 - **inverter_temp** (*Optional*): Inverter temperature (°C)
 - **boost_temp** (*Optional*): Boost temperature (°C)
 - **ambient_temp** (*Optional*): Ambient temperature (°C)
+- **protocol_version** (*Optional*): FoxESS communication protocol version reported by the inverter
+- **serial_number** (*Optional*): Inverter serial number from heartbeat frames; configured only when you want to expose it in Home Assistant
 
 ## Hardware setup
 The hardware setup including a wiring diagram can be found in the [Wiki](https://github.com/assembly12/Foxess-T-series-ESPHome-Home-Assistant/wiki/Hardware-setup).

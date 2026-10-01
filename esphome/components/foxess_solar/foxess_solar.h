@@ -40,6 +40,11 @@ struct MsgOffset {
   static constexpr std::size_t DEVICE_ATTRIBUTE_AFG_VERSION   = 49;
   static constexpr std::size_t DEVICE_ATTRIBUTE_PAYLOAD_LEN   = 46;
 
+  // Heartbeat (function 0x06)
+  static constexpr std::size_t HEARTBEAT_PROTOCOL_VERSION     = 9;
+  static constexpr std::size_t HEARTBEAT_SERIAL_NUMBER        = 15;
+  static constexpr std::size_t HEARTBEAT_PAYLOAD_LEN          = 21;
+
   // powers
   static constexpr std::size_t GRID_POWER_MSB    = 9;
   static constexpr std::size_t GRID_POWER_LSB    = 10;
@@ -107,6 +112,8 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   void set_device_type_sensor(text_sensor::TextSensor *sensor) { this->device_type_ = sensor; }
   void set_device_model_sensor(text_sensor::TextSensor *sensor) { this->device_model_ = sensor; }
   void set_afg_version_sensor(text_sensor::TextSensor *sensor) { this->afg_version_ = sensor; }
+  void set_protocol_version_sensor(text_sensor::TextSensor *sensor) { this->protocol_version_ = sensor; }
+  void set_serial_number_sensor(text_sensor::TextSensor *sensor) { this->serial_number_ = sensor; }
   SENSOR_SETTER(device_capacity)
   SENSOR_SETTER(energy_production_day)
   SENSOR_SETTER(total_energy_production)
@@ -126,6 +133,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
  protected:
   void parse_message();
   void parse_device_attributes();
+  void parse_heartbeat();
   void set_inverter_mode(uint32_t mode);
   optional<bool> check_msg();
 
@@ -172,6 +180,8 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *device_type_{nullptr};
   text_sensor::TextSensor *device_model_{nullptr};
   text_sensor::TextSensor *afg_version_{nullptr};
+  text_sensor::TextSensor *protocol_version_{nullptr};
+  text_sensor::TextSensor *serial_number_{nullptr};
   sensor::Sensor *device_capacity_{nullptr};
   sensor::Sensor *energy_production_day_{nullptr};
   sensor::Sensor *total_energy_production_{nullptr};

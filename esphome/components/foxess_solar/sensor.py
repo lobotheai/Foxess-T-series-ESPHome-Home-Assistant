@@ -55,6 +55,8 @@ CONF_DEVICE_TYPE = "device_type"
 CONF_DEVICE_MODEL = "device_model"
 CONF_DEVICE_CAPACITY = "device_capacity"
 CONF_AFG_VERSION = "afg_version"
+CONF_PROTOCOL_VERSION = "protocol_version"
+CONF_SERIAL_NUMBER = "serial_number"
 
 DEPENDENCIES = ["uart"]
 
@@ -181,6 +183,8 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_DEVICE_TYPE): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_DEVICE_MODEL): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_AFG_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_PROTOCOL_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_SERIAL_NUMBER): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_DEVICE_CAPACITY): sensor.sensor_schema(
                 unit_of_measurement=UNIT_WATT,
                 accuracy_decimals=0,
@@ -230,6 +234,8 @@ async def to_code(config):
         CONF_DEVICE_TYPE,
         CONF_DEVICE_MODEL,
         CONF_AFG_VERSION,
+        CONF_PROTOCOL_VERSION,
+        CONF_SERIAL_NUMBER,
     ]:
         if key in config:
             sens = await text_sensor.new_text_sensor(config[key])

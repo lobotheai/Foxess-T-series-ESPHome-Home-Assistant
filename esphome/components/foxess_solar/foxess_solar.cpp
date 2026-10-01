@@ -202,6 +202,11 @@ void FoxessSolar::parse_message() {
     return;
   }
 
+  if (function_code == 0x06) {
+    this->parse_heartbeat();
+    return;
+  }
+
   if (function_code != 0x02) {
     ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
     return;
@@ -341,6 +346,21 @@ void FoxessSolar::parse_device_attributes() {
                        1.0f);
   if (this->afg_version_ != nullptr)
     this->afg_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_AFG_VERSION], 6));
+}
+
+void FoxessSolar::parse_heartbeat() {
+  auto &msg = this->input_buffer;
+  const uint16_t payload_len = decode_uint16(msg[7], msg[8]);
+  if (payload_len != MsgOffset::HEARTBEAT_PAYLOAD_LEN) {
+    ESP_LOGD(TAG, "Unsupported FoxESS heartbeat payload length: %u", payload_len);
+    return;
+  }
+
+  if (this->protocol_version_ != nullptr)
+    this->protocol_version_->publish_state(decode_ascii(&msg[MsgOffset::HEARTBEAT_PROTOCOL_VERSION], 6));
+  // Serial number is exposed only when explicitly configured and is never written to logs.
+  if (this->serial_number_ != nullptr)
+    this->serial_number_->publish_state(decode_ascii(&msg[MsgOffset::HEARTBEAT_SERIAL_NUMBER], 15));
 }
 
 void FoxessSolar::set_inverter_mode(uint32_t mode) {
