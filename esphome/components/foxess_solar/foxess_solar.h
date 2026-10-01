@@ -133,6 +133,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
  protected:
   void parse_message();
   void parse_device_attributes();
+  void parse_realtime_data();
   void parse_heartbeat();
   void set_inverter_mode(uint32_t mode);
   optional<bool> check_msg();

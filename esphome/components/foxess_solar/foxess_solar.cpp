@@ -197,20 +197,24 @@ void FoxessSolar::parse_message() {
   ESP_LOGD(TAG, "FoxESS frame: function=0x%02X payload=%u total=%u", function_code,
            payload_len, static_cast<unsigned>(total_len));
 
-  if (function_code == 0x01) {
-    this->parse_device_attributes();
-    return;
+  switch (function_code) {
+    case 0x01:
+      this->parse_device_attributes();
+      return;
+    case 0x02:
+      this->parse_realtime_data();
+      return;
+    case 0x06:
+      this->parse_heartbeat();
+      return;
+    default:
+      ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
+      return;
   }
+}
 
-  if (function_code == 0x06) {
-    this->parse_heartbeat();
-    return;
-  }
-
-  if (function_code != 0x02) {
-    ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
-    return;
-  }
+void FoxessSolar::parse_realtime_data() {
+  auto &msg = this->input_buffer;
 
   // powers
   publish_sensor_state(this->grid_power_,
