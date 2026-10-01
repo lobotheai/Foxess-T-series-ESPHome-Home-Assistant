@@ -139,6 +139,22 @@ sensor:
       name: "FoxESS EPS Power"
     fault_registers:
       name: "FoxESS Fault Registers"
+    master_version:
+      name: "FoxESS Master Version"
+    slave_version:
+      name: "FoxESS Slave Version"
+    manager_version:
+      name: "FoxESS Manager Version"
+    device_factory:
+      name: "FoxESS Device Factory"
+    device_type:
+      name: "FoxESS Device Type"
+    device_model:
+      name: "FoxESS Device Model"
+    device_capacity:
+      name: "FoxESS Device Capacity"
+    afg_version:
+      name: "FoxESS AFG Version"
 
     inverter_temp:
       name: "FoxESS Inverter Temp"

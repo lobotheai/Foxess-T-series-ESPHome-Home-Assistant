@@ -29,6 +29,17 @@ static const std::array<uint8_t, 2> MSG_FOOTER = {0xE7, 0xE7};
 
 // All offsets in one place
 struct MsgOffset {
+  // Device attributes (function 0x01)
+  static constexpr std::size_t DEVICE_ATTRIBUTE_MASTER_VERSION = 9;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_SLAVE_VERSION  = 15;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_MANAGER_VERSION = 21;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_FACTORY       = 27;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_TYPE          = 29;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_MODEL         = 31;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_CAPACITY      = 47;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_AFG_VERSION   = 49;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_PAYLOAD_LEN   = 46;
+
   // powers
   static constexpr std::size_t GRID_POWER_MSB    = 9;
   static constexpr std::size_t GRID_POWER_LSB    = 10;
@@ -85,6 +96,18 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   void set_fault_registers_sensor(text_sensor::TextSensor *sensor) {
     this->fault_registers_ = sensor;
   }
+  void set_master_version_sensor(text_sensor::TextSensor *sensor) {
+    this->master_version_ = sensor;
+  }
+  void set_slave_version_sensor(text_sensor::TextSensor *sensor) { this->slave_version_ = sensor; }
+  void set_manager_version_sensor(text_sensor::TextSensor *sensor) {
+    this->manager_version_ = sensor;
+  }
+  void set_device_factory_sensor(text_sensor::TextSensor *sensor) { this->device_factory_ = sensor; }
+  void set_device_type_sensor(text_sensor::TextSensor *sensor) { this->device_type_ = sensor; }
+  void set_device_model_sensor(text_sensor::TextSensor *sensor) { this->device_model_ = sensor; }
+  void set_afg_version_sensor(text_sensor::TextSensor *sensor) { this->afg_version_ = sensor; }
+  SENSOR_SETTER(device_capacity)
   SENSOR_SETTER(energy_production_day)
   SENSOR_SETTER(total_energy_production)
   SENSOR_SETTER(inverter_status)
@@ -102,6 +125,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
 
  protected:
   void parse_message();
+  void parse_device_attributes();
   void set_inverter_mode(uint32_t mode);
   optional<bool> check_msg();
 
@@ -141,6 +165,14 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *eps_current_{nullptr};
   sensor::Sensor *eps_power_{nullptr};
   text_sensor::TextSensor *fault_registers_{nullptr};
+  text_sensor::TextSensor *master_version_{nullptr};
+  text_sensor::TextSensor *slave_version_{nullptr};
+  text_sensor::TextSensor *manager_version_{nullptr};
+  text_sensor::TextSensor *device_factory_{nullptr};
+  text_sensor::TextSensor *device_type_{nullptr};
+  text_sensor::TextSensor *device_model_{nullptr};
+  text_sensor::TextSensor *afg_version_{nullptr};
+  sensor::Sensor *device_capacity_{nullptr};
   sensor::Sensor *energy_production_day_{nullptr};
   sensor::Sensor *total_energy_production_{nullptr};
 };

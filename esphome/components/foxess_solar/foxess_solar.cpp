@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 #include "foxess_solar.h"
 #include "esphome/core/log.h"
@@ -37,6 +38,18 @@ static inline uint32_t decode_uint32(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t
          (static_cast<uint32_t>(b1) << 16) |
          (static_cast<uint32_t>(b2) << 8)  |
          (static_cast<uint32_t>(b3));
+}
+
+static std::string decode_ascii(const uint8_t *data, std::size_t length) {
+  std::string value;
+  value.reserve(length);
+  for (std::size_t i = 0; i < length; i++) {
+    if (data[i] == 0)
+      break;
+    if (data[i] >= 0x20 && data[i] <= 0x7E)
+      value.push_back(static_cast<char>(data[i]));
+  }
+  return value;
 }
 
 }
@@ -184,6 +197,11 @@ void FoxessSolar::parse_message() {
   ESP_LOGD(TAG, "FoxESS frame: function=0x%02X payload=%u total=%u", function_code,
            payload_len, static_cast<unsigned>(total_len));
 
+  if (function_code == 0x01) {
+    this->parse_device_attributes();
+    return;
+  }
+
   if (function_code != 0x02) {
     ESP_LOGD(TAG, "Unsupported FoxESS function code: 0x%02X", function_code);
     return;
@@ -294,6 +312,35 @@ void FoxessSolar::parse_message() {
   }
 
   this->set_inverter_mode(1);  // ONLINE
+}
+
+void FoxessSolar::parse_device_attributes() {
+  auto &msg = this->input_buffer;
+  const uint16_t payload_len = decode_uint16(msg[7], msg[8]);
+  if (payload_len != MsgOffset::DEVICE_ATTRIBUTE_PAYLOAD_LEN) {
+    ESP_LOGD(TAG, "Unsupported FoxESS device attribute payload length: %u", payload_len);
+    return;
+  }
+
+  if (this->master_version_ != nullptr)
+    this->master_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_MASTER_VERSION], 6));
+  if (this->slave_version_ != nullptr)
+    this->slave_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_SLAVE_VERSION], 6));
+  if (this->manager_version_ != nullptr)
+    this->manager_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_MANAGER_VERSION], 6));
+  if (this->device_factory_ != nullptr)
+    this->device_factory_->publish_state(std::to_string(decode_uint16(msg[MsgOffset::DEVICE_ATTRIBUTE_FACTORY],
+                                                                     msg[MsgOffset::DEVICE_ATTRIBUTE_FACTORY + 1])));
+  if (this->device_type_ != nullptr)
+    this->device_type_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_TYPE], 2));
+  if (this->device_model_ != nullptr)
+    this->device_model_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_MODEL], 16));
+  publish_sensor_state(this->device_capacity_,
+                       decode_uint16(msg[MsgOffset::DEVICE_ATTRIBUTE_CAPACITY],
+                                     msg[MsgOffset::DEVICE_ATTRIBUTE_CAPACITY + 1]),
+                       1.0f);
+  if (this->afg_version_ != nullptr)
+    this->afg_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_AFG_VERSION], 6));
 }
 
 void FoxessSolar::set_inverter_mode(uint32_t mode) {

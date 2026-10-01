@@ -47,6 +47,14 @@ CONF_EPS_VOLTAGE = "eps_voltage"
 CONF_EPS_CURRENT = "eps_current"
 CONF_EPS_POWER = "eps_power"
 CONF_FAULT_REGISTERS = "fault_registers"
+CONF_MASTER_VERSION = "master_version"
+CONF_SLAVE_VERSION = "slave_version"
+CONF_MANAGER_VERSION = "manager_version"
+CONF_DEVICE_FACTORY = "device_factory"
+CONF_DEVICE_TYPE = "device_type"
+CONF_DEVICE_MODEL = "device_model"
+CONF_DEVICE_CAPACITY = "device_capacity"
+CONF_AFG_VERSION = "afg_version"
 
 DEPENDENCIES = ["uart"]
 
@@ -166,6 +174,18 @@ CONFIG_SCHEMA = (
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_FAULT_REGISTERS): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_MASTER_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_SLAVE_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_MANAGER_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_DEVICE_FACTORY): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_DEVICE_TYPE): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_DEVICE_MODEL): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_AFG_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_DEVICE_CAPACITY): sensor.sensor_schema(
+                unit_of_measurement=UNIT_WATT,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_POWER,
+            ),
             cv.Optional(CONF_BOOST_TEMP): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=0,
@@ -202,6 +222,19 @@ async def to_code(config):
         fault_registers = await text_sensor.new_text_sensor(config[CONF_FAULT_REGISTERS])
         cg.add(var.set_fault_registers_sensor(fault_registers))
 
+    for key in [
+        CONF_MASTER_VERSION,
+        CONF_SLAVE_VERSION,
+        CONF_MANAGER_VERSION,
+        CONF_DEVICE_FACTORY,
+        CONF_DEVICE_TYPE,
+        CONF_DEVICE_MODEL,
+        CONF_AFG_VERSION,
+    ]:
+        if key in config:
+            sens = await text_sensor.new_text_sensor(config[key])
+            cg.add(getattr(var, f"set_{key}_sensor")(sens))
+
     # flow control pin
     flow_control_pin = await cg.gpio_pin_expression(config[CONF_FLOW_CONTROL_PIN])
     cg.add(var.set_fc_pin(flow_control_pin))
@@ -217,6 +250,7 @@ async def to_code(config):
         CONF_EPS_VOLTAGE,
         CONF_EPS_CURRENT,
         CONF_EPS_POWER,
+        CONF_DEVICE_CAPACITY,
         CONF_BOOST_TEMP,
         CONF_ENERGY_PRODUCTION_DAY,
         CONF_TOTAL_ENERGY_PRODUCTION,
