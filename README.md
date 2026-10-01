@@ -20,6 +20,7 @@ Other models may use different firmware or protocol layouts. Their compatibility
 | `0x06` | Protocol version and inverter serial number | Yes |
 
 Frames are checked for their declared length, checksum, and footer before parsing. Valid frames with unsupported function codes are logged at `DEBUG` and skipped.
+The protocol version from heartbeat frames is retained and logged at `DEBUG` when it changes. Unknown versions are still accepted, using the current parser layout; version-specific offsets are not inferred automatically.
 
 ```yaml
 uart:

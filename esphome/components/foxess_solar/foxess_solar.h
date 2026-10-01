@@ -6,6 +6,7 @@
 #include "esphome/components/uart/uart.h"
 #include <array>
 #include <cstddef>
+#include <string>
 
 #define SENSOR_SETTER(X) \
   void set_##X##_sensor(sensor::Sensor *sensor) { this->X##_ = sensor; }
@@ -183,6 +184,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *afg_version_{nullptr};
   text_sensor::TextSensor *protocol_version_{nullptr};
   text_sensor::TextSensor *serial_number_{nullptr};
+  std::string protocol_version_value_;
   sensor::Sensor *device_capacity_{nullptr};
   sensor::Sensor *energy_production_day_{nullptr};
   sensor::Sensor *total_energy_production_{nullptr};

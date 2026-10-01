@@ -360,9 +360,15 @@ void FoxessSolar::parse_heartbeat() {
     return;
   }
 
+  const std::string protocol_version =
+      decode_ascii(&msg[MsgOffset::HEARTBEAT_PROTOCOL_VERSION], 6);
+  if (!protocol_version.empty() && protocol_version != this->protocol_version_value_) {
+    this->protocol_version_value_ = protocol_version;
+    ESP_LOGD(TAG, "FoxESS protocol version: %s", this->protocol_version_value_.c_str());
+  }
   if (this->protocol_version_ != nullptr)
-    this->protocol_version_->publish_state(decode_ascii(&msg[MsgOffset::HEARTBEAT_PROTOCOL_VERSION], 6));
-  // Serial number is exposed only when explicitly configured and is never written to logs.
+    this->protocol_version_->publish_state(protocol_version);
+  // Serial number is exposed only when explicitly configured. ESPHome VERBOSE logs may include its state.
   if (this->serial_number_ != nullptr)
     this->serial_number_->publish_state(decode_ascii(&msg[MsgOffset::HEARTBEAT_SERIAL_NUMBER], 15));
 }
