@@ -3,9 +3,23 @@ Read out FoxESS Inverters to Home Assistant using ESPHome.
 
 ![FoxESS](resources/images/foxess.png)
 
-Compatible with:
-- Foxess T-series
-- Foxess F-series
+Designed for FoxESS T-series. The upstream project also lists F-series, but this repository has not independently verified those models.
+
+Tested with:
+- FoxESS T6-G3
+
+Other models may use different firmware or protocol layouts. Their compatibility has not been verified by this project.
+
+## Protocol support
+
+| Function code | Data | Support |
+|---|---|---|
+| `0x01` | Device attributes and firmware versions | Yes |
+| `0x02` | Realtime inverter telemetry | Yes |
+| `0x03` | Other data frame, not decoded | Detected and skipped |
+| `0x06` | Protocol version and inverter serial number | Yes |
+
+Frames are checked for their declared length, checksum, and footer before parsing. Valid frames with unsupported function codes are logged at `DEBUG` and skipped.
 
 ```yaml
 uart:
@@ -78,7 +92,7 @@ sensor:
 - **pv1** (*Optional*): Sensors related to the first group PV cells
   - **current** (*Optional*): Current flowing from PV1 (A)
   - **voltage** (*Optional*): PV1 Voltage (V)
-  - **active_power** (*Optional*): PV1 power production (W)
+  - **active_power** (*Optional*): Estimated PV1 power, calculated as voltage × current (W)
 - **pv2** (*Optional*): Sensors related to the second group PV cells
   - See **pv1**
 - **pv3** (*Optional*): Sensors related to the third group PV cells
@@ -90,18 +104,35 @@ sensor:
 - **energy_production_day** (*Optional*): Total energy produced today (kWh)
 - **generation_power** (*Optional*): Current total power generation (W)
 - **grid_power** (*Optional*): Current export power to grid. Required to have a meter connected to the inverter (SDM230). (W)
-- **loads_power** (*Optional*): (W)
+- **loads_power** (*Optional*): Current loads power (W)
 - **inverter_temp** (*Optional*): Inverter temperature (°C)
 - **boost_temp** (*Optional*): Boost temperature (°C)
 - **ambient_temp** (*Optional*): Ambient temperature (°C)
-- **protocol_version** (*Optional*): FoxESS communication protocol version reported by the inverter
-- **serial_number** (*Optional*): Inverter serial number from heartbeat frames; configured only when you want to expose it in Home Assistant
+- **eps_voltage**, **eps_current**, **eps_power** (*Optional*): EPS output voltage (V), current (A), and power (W)
+- **fault_registers** (*Optional*): Text summary of the eight raw 32-bit fault registers. Values are not decoded into fault names.
+- **master_version**, **slave_version**, **manager_version**, **afg_version** (*Optional*): Firmware version strings reported by the inverter
+- **device_factory**, **device_type**, **device_model** (*Optional*): Device identification fields
+- **device_capacity** (*Optional*): Rated device capacity (W)
+- **protocol_version** (*Optional*): FoxESS protocol version from heartbeat frames
+- **serial_number** (*Optional*): Inverter serial number from heartbeat frames. Only configure this if you want to expose it as an entity in Home Assistant. ESPHome `VERBOSE` logging may also print published sensor values; use `DEBUG` for routine operation.
+
+New entities are optional. Add only the keys you need under `sensor: - platform: foxess_solar`; see [foxess-inverter.yaml.example](foxess-inverter.yaml.example) for a complete example.
+
+## Troubleshooting
+
+- **No realtime values:** Check RS485 A/B wiring, the transceiver direction pin, UART pins, and the inverter's communication settings. The component expects 9600 baud by default in the example configuration.
+- **`checksum mismatch` or `bad footer`:** These indicate an invalid/corrupted frame. Check the wiring, grounding, baud rate, and electrical noise on the RS485 bus.
+- **`Unsupported FoxESS function code`:** The frame passed basic validation but its data type is not decoded yet. It is skipped so subsequent frames can still be processed.
+- **No `0x01` or `0x06` entities:** Configure the corresponding optional text sensors and confirm that frames with those function codes appear in the debug log.
+- **Inverter shows `Error`:** Check the `fault_registers` text sensor for raw register values. Their bits are not currently mapped to human-readable fault names.
+
+For a short diagnostic session, set `logger.level: DEBUG` (or `VERBOSE` to include sensor state changes). Avoid leaving `VERBOSE` enabled during routine operation because it can affect ESP8266 performance and may log configured text sensor values such as the serial number.
 
 ## Hardware setup
 The hardware setup including a wiring diagram can be found in the [Wiki](https://github.com/assembly12/Foxess-T-series-ESPHome-Home-Assistant/wiki/Hardware-setup).
 
 Designing a custom pcb and enclosure is next on my to do list. I'll update here with the corresponding gerber and stl files when done.
 
-There is some more info being send (like error messages and so on), however this is really not to usefull so I left it out of this component.
+Other protocol fields may be present but are not exposed until their meaning and scaling are confirmed.
 
 Some basic electronics skills (like soldering) are needed to realize this project. I do not take any responsibility for the use of this custom component or anything that it written down in this repository. Use at your own risk.
