@@ -223,9 +223,8 @@ void FoxessSolar::parse_message() {
     publish_sensor_state(pv.voltage_sensor_, volt, 0.1f);
     publish_sensor_state(pv.current_sensor_, amps, 0.1f);
     publish_sensor_state(pv.active_power_sensor_,
-                         decode_uint16(msg[base + MsgOffset::PV_POWER_OFFSET],
-                                       msg[base + MsgOffset::PV_POWER_OFFSET + 1]),
-                         1.0f);
+                         static_cast<int32_t>(volt) * static_cast<int32_t>(amps),
+                         0.01f);
   }
 
   // EPS output

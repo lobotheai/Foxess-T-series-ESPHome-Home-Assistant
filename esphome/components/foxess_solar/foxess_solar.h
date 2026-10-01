@@ -43,7 +43,6 @@ struct MsgOffset {
   // PVs
   static constexpr std::size_t PV1_BASE          = 39;  // 39..42
   static constexpr std::size_t PV_STRIDE         = 6;   // 45, 51, 57
-  static constexpr std::size_t PV_POWER_OFFSET   = 4;   // power follows voltage and current
 
   // EPS output
   static constexpr std::size_t EPS_VOLTAGE_MSB   = 99;
