@@ -21,6 +21,7 @@ Other models may use different firmware or protocol layouts. Their compatibility
 
 Frames are checked for their declared length, checksum, and footer before parsing. Valid frames with unsupported function codes are logged at `DEBUG` and skipped.
 The protocol version from heartbeat frames is retained and logged at `DEBUG` when it changes. Unknown versions are still accepted, using the current parser layout; version-specific offsets are not inferred automatically.
+The `0x02` parser accepts the documented 152-byte layout and ignores other payload lengths. Frame timestamps are logged as raw 32-bit values. At `DEBUG`, the component also compares reported PV power with the voltage × current estimate and logs changes in the undocumented `Rev.1`–`Rev.10` fields and `0x03` payload.
 
 ```yaml
 uart:
@@ -115,7 +116,7 @@ sensor:
 - **eps_voltage**, **eps_current**, **eps_power** (*Optional*): EPS output voltage (V), current (A), and power (W)
 - **fault_registers** (*Optional*): Text summary of the eight raw 32-bit fault registers. Values are not decoded into fault names.
 - **master_version**, **slave_version**, **manager_version**, **afg_version** (*Optional*): Firmware version strings reported by the inverter
-- **device_factory**, **device_type**, **device_model** (*Optional*): Device identification fields
+- **device_factory**, **device_type**, **device_model** (*Optional*): Device identification fields. Known factory IDs are exposed as names; unknown IDs retain their numeric value in the text.
 - **device_capacity** (*Optional*): Rated device capacity (W)
 - **protocol_version** (*Optional*): FoxESS protocol version from heartbeat frames
 - **serial_number** (*Optional*): Inverter serial number from heartbeat frames. Only configure this if you want to expose it as an entity in Home Assistant. ESPHome `VERBOSE` logging may also print published sensor values; use `DEBUG` for routine operation.

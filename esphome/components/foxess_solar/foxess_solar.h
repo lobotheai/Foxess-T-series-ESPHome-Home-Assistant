@@ -94,6 +94,10 @@ struct MsgOffset {
   static constexpr std::size_t CONSUMPTION_GENERATION_2_MSB   = 91;  // 91..94
   static constexpr std::size_t LOADS_GENERATION_MSB           = 95;  // 95..98
 
+  // Reserved fields (Rev.1..Rev.10)
+  static constexpr std::size_t REV_FIELDS_BEGIN                = 105;
+  static constexpr std::size_t REV_FIELDS_COUNT                = 10;
+
   // error block
   static constexpr std::size_t ERROR_BLOCK_BEGIN = 125;
   static constexpr std::size_t ERROR_BLOCK_END   = 157; // exclusive
@@ -171,11 +175,18 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   void publish_zero_pvs();
 
   GPIOPin *flow_control_pin_{nullptr};
-  uint32_t millis_lastmessage_{0};
   std::array<uint8_t, BUFFER_SIZE> input_buffer{};
   std::size_t buffer_end{0};
 
   uint32_t inverter_mode_{99};
+  uint32_t millis_last_frame_{0};
+  uint32_t millis_last_realtime_{0};
+  std::array<uint8_t, 50> last_function_03_payload_{};
+  bool has_function_03_payload_{false};
+  std::array<uint16_t, MsgOffset::REV_FIELDS_COUNT> last_rev_values_{};
+  bool has_rev_sample_{false};
+  std::string last_fault_registers_value_;
+  bool has_fault_registers_value_{false};
   sensor::Sensor *inverter_status_{nullptr};  // 0=Offline, 1=Online, 2=Error, 99=Waiting...
   sensor::Sensor *function_03_counter_{nullptr};
   sensor::Sensor *from_grid_yield_generation_{nullptr};
