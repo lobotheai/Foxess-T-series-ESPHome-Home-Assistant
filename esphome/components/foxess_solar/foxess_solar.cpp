@@ -172,13 +172,7 @@ optional<bool> FoxessSolar::check_msg() {
 void FoxessSolar::parse_message() {
   ESP_LOGVV(TAG, "parse_message start");
 
-  const std::size_t total_len = this->buffer_end + 1;
   auto &msg = this->input_buffer;
-
-  if (total_len != 163) {
-    ESP_LOGW(TAG, "unexpected message length: %u (expected 163)", (unsigned) total_len);
-    this->status_set_warning();
-  }
 
   // powers
   publish_sensor_state(this->grid_power_,
