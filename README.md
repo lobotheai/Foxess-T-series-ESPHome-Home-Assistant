@@ -115,7 +115,7 @@ sensor:
 - **ambient_temp** (*Optional*): Ambient temperature (°C)
 - **eps_voltage**, **eps_current**, **eps_power** (*Optional*): EPS output voltage (V), current (A), and power (W)
 - **fault_registers** (*Optional*): Text summary of the eight raw 32-bit fault registers. Values are not decoded into fault names.
-- **master_version**, **slave_version**, **manager_version**, **afg_version** (*Optional*): Firmware version strings reported by the inverter
+- **master_version**, **slave_version**, **manager_version**, **afci_version** (*Optional*): Firmware version strings reported by the inverter (`AFCIVersion` in the FoxESS protocol)
 - **device_factory**, **device_type**, **device_model** (*Optional*): Device identification fields. Known factory IDs are exposed as names; unknown IDs retain their numeric value in the text.
 - **device_capacity** (*Optional*): Rated device capacity (W)
 - **protocol_version** (*Optional*): FoxESS protocol version from heartbeat frames

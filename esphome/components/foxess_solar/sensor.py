@@ -54,7 +54,7 @@ CONF_DEVICE_FACTORY = "device_factory"
 CONF_DEVICE_TYPE = "device_type"
 CONF_DEVICE_MODEL = "device_model"
 CONF_DEVICE_CAPACITY = "device_capacity"
-CONF_AFG_VERSION = "afg_version"
+CONF_AFCI_VERSION = "afci_version"
 CONF_PROTOCOL_VERSION = "protocol_version"
 CONF_SERIAL_NUMBER = "serial_number"
 CONF_FUNCTION_03_COUNTER = "function_03_counter"
@@ -230,7 +230,7 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_DEVICE_FACTORY): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_DEVICE_TYPE): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_DEVICE_MODEL): text_sensor.text_sensor_schema(),
-            cv.Optional(CONF_AFG_VERSION): text_sensor.text_sensor_schema(),
+            cv.Optional(CONF_AFCI_VERSION): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_PROTOCOL_VERSION): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_SERIAL_NUMBER): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_DEVICE_CAPACITY): sensor.sensor_schema(
@@ -281,7 +281,7 @@ async def to_code(config):
         CONF_DEVICE_FACTORY,
         CONF_DEVICE_TYPE,
         CONF_DEVICE_MODEL,
-        CONF_AFG_VERSION,
+        CONF_AFCI_VERSION,
         CONF_PROTOCOL_VERSION,
         CONF_SERIAL_NUMBER,
     ]:

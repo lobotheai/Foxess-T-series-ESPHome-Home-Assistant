@@ -40,7 +40,7 @@ struct MsgOffset {
   static constexpr std::size_t DEVICE_ATTRIBUTE_TYPE          = 29;
   static constexpr std::size_t DEVICE_ATTRIBUTE_MODEL         = 31;
   static constexpr std::size_t DEVICE_ATTRIBUTE_CAPACITY      = 47;
-  static constexpr std::size_t DEVICE_ATTRIBUTE_AFG_VERSION   = 49;
+  static constexpr std::size_t DEVICE_ATTRIBUTE_AFCI_VERSION  = 49;
   static constexpr std::size_t DEVICE_ATTRIBUTE_PAYLOAD_LEN   = 46;
 
   // Heartbeat (function 0x06)
@@ -134,7 +134,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   void set_device_factory_sensor(text_sensor::TextSensor *sensor) { this->device_factory_ = sensor; }
   void set_device_type_sensor(text_sensor::TextSensor *sensor) { this->device_type_ = sensor; }
   void set_device_model_sensor(text_sensor::TextSensor *sensor) { this->device_model_ = sensor; }
-  void set_afg_version_sensor(text_sensor::TextSensor *sensor) { this->afg_version_ = sensor; }
+  void set_afci_version_sensor(text_sensor::TextSensor *sensor) { this->afci_version_ = sensor; }
   void set_protocol_version_sensor(text_sensor::TextSensor *sensor) { this->protocol_version_ = sensor; }
   void set_serial_number_sensor(text_sensor::TextSensor *sensor) { this->serial_number_ = sensor; }
   SENSOR_SETTER(device_capacity)
@@ -228,7 +228,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *device_factory_{nullptr};
   text_sensor::TextSensor *device_type_{nullptr};
   text_sensor::TextSensor *device_model_{nullptr};
-  text_sensor::TextSensor *afg_version_{nullptr};
+  text_sensor::TextSensor *afci_version_{nullptr};
   text_sensor::TextSensor *protocol_version_{nullptr};
   text_sensor::TextSensor *serial_number_{nullptr};
   std::string protocol_version_value_;

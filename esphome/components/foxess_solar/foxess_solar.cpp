@@ -219,8 +219,10 @@ void FoxessSolar::parse_message() {
   const uint16_t payload_len = decode_uint16(msg[7], msg[8]);
   const uint32_t frame_timestamp = decode_uint32(msg[3], msg[4], msg[5], msg[6]);
 
-  ESP_LOGD(TAG, "FoxESS frame: function=0x%02X timestamp=%lu payload=%u total=%u",
-           static_cast<unsigned>(function_code), static_cast<unsigned long>(frame_timestamp),
+  ESP_LOGD(TAG, "FoxESS frame: function=0x%02X timestamp_raw=%02X %02X %02X %02X timestamp_u32=%lu payload=%u total=%u",
+           static_cast<unsigned>(function_code), static_cast<unsigned>(msg[3]),
+           static_cast<unsigned>(msg[4]), static_cast<unsigned>(msg[5]),
+           static_cast<unsigned>(msg[6]), static_cast<unsigned long>(frame_timestamp),
            static_cast<unsigned>(payload_len), static_cast<unsigned>(total_len));
 
   switch (function_code) {
@@ -496,8 +498,8 @@ void FoxessSolar::parse_device_attributes() {
                        decode_uint16(msg[MsgOffset::DEVICE_ATTRIBUTE_CAPACITY],
                                      msg[MsgOffset::DEVICE_ATTRIBUTE_CAPACITY + 1]),
                        1.0f);
-  if (this->afg_version_ != nullptr)
-    this->afg_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_AFG_VERSION], 6));
+  if (this->afci_version_ != nullptr)
+    this->afci_version_->publish_state(decode_ascii(&msg[MsgOffset::DEVICE_ATTRIBUTE_AFCI_VERSION], 6));
 }
 
 void FoxessSolar::parse_heartbeat() {

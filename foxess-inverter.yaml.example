@@ -171,8 +171,8 @@ sensor:
       name: "FoxESS Device Model"
     device_capacity:
       name: "FoxESS Device Capacity"
-    afg_version:
-      name: "FoxESS AFG Version"
+    afci_version:
+      name: "FoxESS AFCI Version"
     protocol_version:
       name: "FoxESS Protocol Version"
     # Optional: exposes the inverter serial number in Home Assistant.
