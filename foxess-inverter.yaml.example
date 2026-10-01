@@ -123,6 +123,24 @@ sensor:
       name: "Total Energy Production"
     energy_production_day:
       name: "Today Energy Production"
+    # Optional cumulative energy counters from the 0x02 realtime frame.
+    # from_grid_yield_generation:
+    #   name: "FoxESS From Grid Yield Generation"
+    # feedin_generation_1:
+    #   name: "FoxESS Feed-in Generation 1"
+    # feedin_generation_2:
+    #   name: "FoxESS Feed-in Generation 2"
+    # consumption_generation_1:
+    #   name: "FoxESS Consumption Generation 1"
+    # consumption_generation_2:
+    #   name: "FoxESS Consumption Generation 2"
+    # loads_generation:
+    #   name: "FoxESS Loads Generation"
+    # Optional raw values at the end of the 0x02 frame.
+    # master_state:
+    #   name: "FoxESS Master State (raw)"
+    # pv_input_number:
+    #   name: "FoxESS PV Input Number"
 
     generation_power:
       name: "FoxESS Generation Power"

@@ -15,8 +15,8 @@ Other models may use different firmware or protocol layouts. Their compatibility
 | Function code | Data | Support |
 |---|---|---|
 | `0x01` | Device attributes and firmware versions | Yes |
-| `0x02` | Realtime inverter telemetry | Yes |
-| `0x03` | 16-bit value at payload offset 36 (observed on T6-G3) | Optional raw counter; meaning not confirmed |
+| `0x02` | Realtime telemetry, energy counters, fault registers, master state, PV input count | Yes; reserved fields remain undocumented |
+| `0x03` | 16-bit value at payload offset 36 (observed on T6-G3) | Optional raw counter; meaning not confirmed; other observed payload bytes are zero |
 | `0x06` | Protocol version and inverter serial number | Yes |
 
 Frames are checked for their declared length, checksum, and footer before parsing. Valid frames with unsupported function codes are logged at `DEBUG` and skipped.
@@ -81,6 +81,8 @@ sensor:
 - **flow_control_pin** (*Optional*, Pin): The pin used to switch the direction of the MAX485 transceiver. Defaults to GPIO4.
 - **inverter_status** (*Optional*): Status code of the inverter (0: offline, 1: online, 2: error, 99: waiting for response)
 - **function_03_counter** (*Optional*): Raw unsigned 16-bit value from function `0x03`; observed to advance once per second on a T6-G3, but its origin and meaning are not confirmed. No unit or Home Assistant state class is assigned.
+- **from_grid_yield_generation**, **feedin_generation_1**, **feedin_generation_2**, **consumption_generation_1**, **consumption_generation_2**, **loads_generation** (*Optional*): Additional cumulative energy counters from the `0x02` frame (0.1 kWh per raw count, published in kWh).
+- **master_state**, **pv_input_number** (*Optional*): Raw unsigned values from the end of the `0x02` frame. The protocol lists these fields but does not document the master-state enum.
 - **phase_a** (*Optional*): Sensors related to first phase of the inverter
   - **current** (*Optional*): Current flowing to the grid (A)
   - **voltage** (*Optional*): Grid voltage (V)

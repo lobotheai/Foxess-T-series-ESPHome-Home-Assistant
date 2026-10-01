@@ -58,6 +58,14 @@ CONF_AFG_VERSION = "afg_version"
 CONF_PROTOCOL_VERSION = "protocol_version"
 CONF_SERIAL_NUMBER = "serial_number"
 CONF_FUNCTION_03_COUNTER = "function_03_counter"
+CONF_FROM_GRID_YIELD_GENERATION = "from_grid_yield_generation"
+CONF_FEEDIN_GENERATION_1 = "feedin_generation_1"
+CONF_FEEDIN_GENERATION_2 = "feedin_generation_2"
+CONF_CONSUMPTION_GENERATION_1 = "consumption_generation_1"
+CONF_CONSUMPTION_GENERATION_2 = "consumption_generation_2"
+CONF_LOADS_GENERATION = "loads_generation"
+CONF_MASTER_STATE = "master_state"
+CONF_PV_INPUT_NUMBER = "pv_input_number"
 
 DEPENDENCIES = ["uart"]
 
@@ -129,6 +137,44 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_PV4): PV_SCHEMA,
             cv.Optional(CONF_INVERTER_STATUS): sensor.sensor_schema(),
             cv.Optional(CONF_FUNCTION_03_COUNTER): sensor.sensor_schema(accuracy_decimals=0),
+            cv.Optional(CONF_FROM_GRID_YIELD_GENERATION): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_FEEDIN_GENERATION_1): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_FEEDIN_GENERATION_2): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_CONSUMPTION_GENERATION_1): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_CONSUMPTION_GENERATION_2): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_LOADS_GENERATION): sensor.sensor_schema(
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            ),
+            cv.Optional(CONF_MASTER_STATE): sensor.sensor_schema(accuracy_decimals=0),
+            cv.Optional(CONF_PV_INPUT_NUMBER): sensor.sensor_schema(accuracy_decimals=0),
             cv.Optional(CONF_LOADS_POWER): sensor.sensor_schema(
                 unit_of_measurement=UNIT_WATT,
                 accuracy_decimals=0,
@@ -251,6 +297,14 @@ async def to_code(config):
     for key in [
         CONF_INVERTER_STATUS,
         CONF_FUNCTION_03_COUNTER,
+        CONF_FROM_GRID_YIELD_GENERATION,
+        CONF_FEEDIN_GENERATION_1,
+        CONF_FEEDIN_GENERATION_2,
+        CONF_CONSUMPTION_GENERATION_1,
+        CONF_CONSUMPTION_GENERATION_2,
+        CONF_LOADS_GENERATION,
+        CONF_MASTER_STATE,
+        CONF_PV_INPUT_NUMBER,
         CONF_LOADS_POWER,
         CONF_GRID_POWER,
         CONF_GENERATION_POWER,

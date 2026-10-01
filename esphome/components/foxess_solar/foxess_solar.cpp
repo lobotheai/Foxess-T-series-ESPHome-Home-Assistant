@@ -24,6 +24,11 @@ static inline void publish_sensor_state(sensor::Sensor *sensor, int32_t raw, flo
   }
 }
 
+static inline void publish_unsigned_sensor_state(sensor::Sensor *sensor, uint32_t raw, float scale) {
+  if (sensor != nullptr)
+    sensor->publish_state(static_cast<float>(raw) * scale);
+}
+
 static inline int16_t decode_int16(uint8_t msb, uint8_t lsb) {
   uint16_t u = static_cast<uint16_t>((static_cast<uint16_t>(msb) << 8) | lsb);
   return static_cast<int16_t>(u);
@@ -241,6 +246,11 @@ void FoxessSolar::parse_message() {
 
 void FoxessSolar::parse_realtime_data() {
   auto &msg = this->input_buffer;
+  const uint16_t payload_len = decode_uint16(msg[7], msg[8]);
+  if (payload_len != MsgOffset::REALTIME_PAYLOAD_LEN) {
+    ESP_LOGD(TAG, "Unsupported FoxESS realtime payload length: %u", payload_len);
+    return;
+  }
 
   // powers
   publish_sensor_state(this->grid_power_,
@@ -320,6 +330,50 @@ void FoxessSolar::parse_realtime_data() {
                                      msg[MsgOffset::TOTAL_ENERGY_MSB0 + 2],
                                      msg[MsgOffset::TOTAL_ENERGY_MSB0 + 3]),
                        0.1f);
+
+  // Additional cumulative energy counters documented in the 152-byte realtime payload.
+  publish_unsigned_sensor_state(this->from_grid_yield_generation_,
+                                decode_uint32(msg[MsgOffset::FROM_GRID_YIELD_GENERATION_MSB],
+                                              msg[MsgOffset::FROM_GRID_YIELD_GENERATION_MSB + 1],
+                                              msg[MsgOffset::FROM_GRID_YIELD_GENERATION_MSB + 2],
+                                              msg[MsgOffset::FROM_GRID_YIELD_GENERATION_MSB + 3]),
+                                0.1f);
+  publish_unsigned_sensor_state(this->feedin_generation_1_,
+                                decode_uint32(msg[MsgOffset::FEEDIN_GENERATION_1_MSB],
+                                              msg[MsgOffset::FEEDIN_GENERATION_1_MSB + 1],
+                                              msg[MsgOffset::FEEDIN_GENERATION_1_MSB + 2],
+                                              msg[MsgOffset::FEEDIN_GENERATION_1_MSB + 3]),
+                                0.1f);
+  publish_unsigned_sensor_state(this->feedin_generation_2_,
+                                decode_uint32(msg[MsgOffset::FEEDIN_GENERATION_2_MSB],
+                                              msg[MsgOffset::FEEDIN_GENERATION_2_MSB + 1],
+                                              msg[MsgOffset::FEEDIN_GENERATION_2_MSB + 2],
+                                              msg[MsgOffset::FEEDIN_GENERATION_2_MSB + 3]),
+                                0.1f);
+  publish_unsigned_sensor_state(this->consumption_generation_1_,
+                                decode_uint32(msg[MsgOffset::CONSUMPTION_GENERATION_1_MSB],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_1_MSB + 1],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_1_MSB + 2],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_1_MSB + 3]),
+                                0.1f);
+  publish_unsigned_sensor_state(this->consumption_generation_2_,
+                                decode_uint32(msg[MsgOffset::CONSUMPTION_GENERATION_2_MSB],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_2_MSB + 1],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_2_MSB + 2],
+                                              msg[MsgOffset::CONSUMPTION_GENERATION_2_MSB + 3]),
+                                0.1f);
+  publish_unsigned_sensor_state(this->loads_generation_,
+                                decode_uint32(msg[MsgOffset::LOADS_GENERATION_MSB],
+                                              msg[MsgOffset::LOADS_GENERATION_MSB + 1],
+                                              msg[MsgOffset::LOADS_GENERATION_MSB + 2],
+                                              msg[MsgOffset::LOADS_GENERATION_MSB + 3]),
+                                0.1f);
+
+  // These are documented as UINT16 values without a published interpretation/enum.
+  publish_sensor_state(this->master_state_, decode_uint16(msg[MsgOffset::MASTER_STATE_MSB],
+                                                          msg[MsgOffset::MASTER_STATE_MSB + 1]), 1.0f);
+  publish_sensor_state(this->pv_input_number_, decode_uint16(msg[MsgOffset::PV_INPUT_NUMBER_MSB],
+                                                             msg[MsgOffset::PV_INPUT_NUMBER_MSB + 1]), 1.0f);
 
   // Keep fault registers as hexadecimal text so all 32 raw bits remain exact.
   if (this->fault_registers_ != nullptr) {

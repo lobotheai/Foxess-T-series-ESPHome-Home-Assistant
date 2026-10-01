@@ -30,6 +30,8 @@ static const std::array<uint8_t, 2> MSG_FOOTER = {0xE7, 0xE7};
 
 // All offsets in one place
 struct MsgOffset {
+  static constexpr std::size_t REALTIME_PAYLOAD_LEN = 152;
+
   // Device attributes (function 0x01)
   static constexpr std::size_t DEVICE_ATTRIBUTE_MASTER_VERSION = 9;
   static constexpr std::size_t DEVICE_ATTRIBUTE_SLAVE_VERSION  = 15;
@@ -84,9 +86,21 @@ struct MsgOffset {
   static constexpr std::size_t ENERGY_DAY_LSB    = 70;
   static constexpr std::size_t TOTAL_ENERGY_MSB0 = 71;  // 71..74
 
+  // Additional energy counters (6 x UINT32, 0.1 kWh)
+  static constexpr std::size_t FROM_GRID_YIELD_GENERATION_MSB = 75;  // 75..78
+  static constexpr std::size_t FEEDIN_GENERATION_1_MSB        = 79;  // 79..82
+  static constexpr std::size_t FEEDIN_GENERATION_2_MSB        = 83;  // 83..86
+  static constexpr std::size_t CONSUMPTION_GENERATION_1_MSB   = 87;  // 87..90
+  static constexpr std::size_t CONSUMPTION_GENERATION_2_MSB   = 91;  // 91..94
+  static constexpr std::size_t LOADS_GENERATION_MSB           = 95;  // 95..98
+
   // error block
   static constexpr std::size_t ERROR_BLOCK_BEGIN = 125;
   static constexpr std::size_t ERROR_BLOCK_END   = 157; // exclusive
+
+  // Realtime tail
+  static constexpr std::size_t MASTER_STATE_MSB       = 157;  // 157..158
+  static constexpr std::size_t PV_INPUT_NUMBER_MSB    = 159;  // 159..160
 };
 
 class FoxessSolar : public PollingComponent, public uart::UARTDevice {
@@ -124,6 +138,14 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   SENSOR_SETTER(total_energy_production)
   SENSOR_SETTER(inverter_status)
   SENSOR_SETTER(function_03_counter)
+  SENSOR_SETTER(from_grid_yield_generation)
+  SENSOR_SETTER(feedin_generation_1)
+  SENSOR_SETTER(feedin_generation_2)
+  SENSOR_SETTER(consumption_generation_1)
+  SENSOR_SETTER(consumption_generation_2)
+  SENSOR_SETTER(loads_generation)
+  SENSOR_SETTER(master_state)
+  SENSOR_SETTER(pv_input_number)
 
   PHASE_SENSOR_SETTER(voltage)
   PHASE_SENSOR_SETTER(current)
@@ -156,6 +178,14 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   uint32_t inverter_mode_{99};
   sensor::Sensor *inverter_status_{nullptr};  // 0=Offline, 1=Online, 2=Error, 99=Waiting...
   sensor::Sensor *function_03_counter_{nullptr};
+  sensor::Sensor *from_grid_yield_generation_{nullptr};
+  sensor::Sensor *feedin_generation_1_{nullptr};
+  sensor::Sensor *feedin_generation_2_{nullptr};
+  sensor::Sensor *consumption_generation_1_{nullptr};
+  sensor::Sensor *consumption_generation_2_{nullptr};
+  sensor::Sensor *loads_generation_{nullptr};
+  sensor::Sensor *master_state_{nullptr};
+  sensor::Sensor *pv_input_number_{nullptr};
 
   struct SolarPhase {
     sensor::Sensor *voltage_sensor_{nullptr};
