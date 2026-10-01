@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 
 #include "foxess_solar.h"
 #include "esphome/core/log.h"
@@ -266,6 +267,23 @@ void FoxessSolar::parse_message() {
                                      msg[MsgOffset::TOTAL_ENERGY_MSB0 + 2],
                                      msg[MsgOffset::TOTAL_ENERGY_MSB0 + 3]),
                        0.1f);
+
+  // Keep fault registers as hexadecimal text so all 32 raw bits remain exact.
+  if (this->fault_registers_ != nullptr) {
+    char summary[128]{};
+    std::size_t summary_len = 0;
+    for (std::size_t i = 0; i < 8; i++) {
+      const std::size_t base = MsgOffset::ERROR_BLOCK_BEGIN + i * 4;
+      const uint32_t value = decode_uint32(msg[base], msg[base + 1], msg[base + 2], msg[base + 3]);
+      const int written = snprintf(summary + summary_len, sizeof(summary) - summary_len,
+                                   "%sF%u=0x%08lX", i == 0 ? "" : " ", static_cast<unsigned>(i + 1),
+                                   static_cast<unsigned long>(value));
+      if (written < 0 || static_cast<std::size_t>(written) >= sizeof(summary) - summary_len)
+        break;
+      summary_len += static_cast<std::size_t>(written);
+    }
+    this->fault_registers_->publish_state(summary);
+  }
 
   // error block check
   if (!std::all_of(msg.begin() + MsgOffset::ERROR_BLOCK_BEGIN,

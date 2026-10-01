@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import pins
-from esphome.components import sensor, uart
+from esphome.components import sensor, text_sensor, uart
 from esphome.const import (
     CONF_ACTIVE_POWER,
     CONF_CURRENT,
@@ -46,6 +46,7 @@ CONF_AMBIENT_TEMP = "ambient_temp"
 CONF_EPS_VOLTAGE = "eps_voltage"
 CONF_EPS_CURRENT = "eps_current"
 CONF_EPS_POWER = "eps_power"
+CONF_FAULT_REGISTERS = "fault_registers"
 
 DEPENDENCIES = ["uart"]
 
@@ -164,6 +165,7 @@ CONFIG_SCHEMA = (
                 device_class=DEVICE_CLASS_POWER,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
+            cv.Optional(CONF_FAULT_REGISTERS): text_sensor.text_sensor_schema(),
             cv.Optional(CONF_BOOST_TEMP): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=0,
@@ -195,6 +197,10 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
+
+    if CONF_FAULT_REGISTERS in config:
+        fault_registers = await text_sensor.new_text_sensor(config[CONF_FAULT_REGISTERS])
+        cg.add(var.set_fault_registers_sensor(fault_registers))
 
     # flow control pin
     flow_control_pin = await cg.gpio_pin_expression(config[CONF_FLOW_CONTROL_PIN])

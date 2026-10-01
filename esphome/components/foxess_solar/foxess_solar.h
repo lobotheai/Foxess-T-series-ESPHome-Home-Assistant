@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
+#include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/uart/uart.h"
 #include <array>
 #include <cstddef>
@@ -81,6 +82,9 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   SENSOR_SETTER(eps_voltage)
   SENSOR_SETTER(eps_current)
   SENSOR_SETTER(eps_power)
+  void set_fault_registers_sensor(text_sensor::TextSensor *sensor) {
+    this->fault_registers_ = sensor;
+  }
   SENSOR_SETTER(energy_production_day)
   SENSOR_SETTER(total_energy_production)
   SENSOR_SETTER(inverter_status)
@@ -136,6 +140,7 @@ class FoxessSolar : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *eps_voltage_{nullptr};
   sensor::Sensor *eps_current_{nullptr};
   sensor::Sensor *eps_power_{nullptr};
+  text_sensor::TextSensor *fault_registers_{nullptr};
   sensor::Sensor *energy_production_day_{nullptr};
   sensor::Sensor *total_energy_production_{nullptr};
 };

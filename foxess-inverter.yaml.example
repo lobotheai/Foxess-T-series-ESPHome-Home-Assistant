@@ -137,6 +137,8 @@ sensor:
       name: "FoxESS EPS Current"
     eps_power:
       name: "FoxESS EPS Power"
+    fault_registers:
+      name: "FoxESS Fault Registers"
 
     inverter_temp:
       name: "FoxESS Inverter Temp"
